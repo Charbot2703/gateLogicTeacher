@@ -11,15 +11,10 @@ class Gate():
 
     def setInput(self, value, index):
         self.inputs[index] = value
+
+    def setInputs(self, inputs):
+        self.inputs = inputs
     
     def evaluate(self):
-        index =  self.logic[ int( "".join( [str(i) for i in self.inputs] ), 2 ) ]
-        print(index)
-
-and_logic = [0, 0, "test", 1]
-
-
-if __name__ == "__main__":
-    g = Gate(1, 1, 1, 1, 2, 1, and_logic)
-    g.setInput(1, 0)
-    g.evaluate()
+        output = self.logic[int("".join([str(i) for i in self.inputs]), 2)]
+        self.outputs = output
