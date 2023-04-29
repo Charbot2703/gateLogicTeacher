@@ -28,9 +28,6 @@ class Level:
             output += " | " + str(self.directions[i]) + "\n"  
         return output
 
-l = Level(3, 1, [1, 0, 1, 0, 1, 0, 1, 0], "")
-print(l.makeTruthTable())
-
 
 
      
