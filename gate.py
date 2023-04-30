@@ -12,8 +12,21 @@ class Gate():
         self.outputs = [Node(0, 0, 15) for i in range(num_of_outputs)]
         self.logic = logic
 
+    def getColor(self):
+        return self.color
+    
+    def getText(self):
+        return self.text
+    
+    def getLogic(self):
+        return self.logic
+
     def getX(self):
         return self.pos[0]
+    
+    def setPos(self, x, y):
+        self.setY(y)
+        self.setX(x)
     
     def setX(self, val):
         self.pos = (val, self.pos[1])
@@ -50,9 +63,15 @@ class Gate():
     def evaluate(self):
         for node in self.inputs:
             node.setValue(node.getPrevNodeValue())
-        output = self.logic[int("".join([str(i.getValue()) for i in self.inputs]), 2)]
-        for i in range(len(output)):
+        non_adders = ["AND", "NOT", "NAND", "OR", "EXOR"]
+        if self.text in non_adders:
+            output = self.logic[int("".join([str(i.getValue()) for i in self.inputs]), 2)]
+        # else:
+        #     list_nums = [i.getValue() for i in self.inputs]
+        #     output = self.logic()(list_nums)
+        for i in range(len(self.outputs)):
             self.outputs[i].setValue(output[i])
+
 
     def draw(self, screen):
         text_size = self.textobject.get_size()
