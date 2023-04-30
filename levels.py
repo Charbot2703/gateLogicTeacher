@@ -4,12 +4,16 @@ WINDOW_WIDTH = 1600
 WINDOW_HEIGHT = 900
 
 class Level:
-    def __init__(self, numInputs, numOutputs, directions, pastLevel):
+    def __init__(self, numInputs, numOutputs, directions, title, pastLevel):
         self.gates = []
         self.directions = directions
+        self.title = title
         self.pastLevel = pastLevel 
         self.inputs = [Node(50, (WINDOW_HEIGHT/(numInputs+1)*(i+1)), 30) for i in range(numInputs)]
         self.outputs = [InputNode(WINDOW_WIDTH - 50, (WINDOW_HEIGHT/(numOutputs+1)*(i+1)), 30) for i in range(numOutputs)]
+
+    def getTitle(self):
+        return self.title
 
     def addGate(self, gate):
         self.gates.append(gate)
@@ -17,11 +21,30 @@ class Level:
     def getGates(self):
         return self.gates
     
+    def setInputs(self, input):
+        inputBinStr = bin(input)[2:]
+        while len(inputBinStr) < len(self.inputs):
+            inputBinStr = "0" + inputBinStr
+        for i in range(len(self.inputs)):
+            self.inputs[i].setValue(int(inputBinStr[i]))
+
     def getInputs(self):
         return self.inputs
     
+    def getInputValues(self):
+        out = []
+        for o in self.inputs:
+            out.append(o.getValue())
+        return out
+
     def getOutputs(self):
         return self.outputs
+    
+    def getOutputValues(self):
+        out = []
+        for o in self.outputs:
+            out.append(o.getValue())
+        return out
 
     def makeTruthTable(self):
         output = ""
@@ -41,7 +64,4 @@ class Level:
                 output += j + "  "
             output += " | " + str(self.directions[i]) + "\n"  
         return output
-
-
-
      
