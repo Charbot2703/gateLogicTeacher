@@ -70,7 +70,6 @@ class Gate():
             list_nums = [i.getValue() for i in self.inputs]
             output = (self.getLogic())(list_nums)
         for i in range(len(self.outputs)):
-            print(i)
             self.outputs[i].setValue(output[i])
 
 
