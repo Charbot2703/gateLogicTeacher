@@ -47,14 +47,18 @@ class Level:
         return out
 
     def makeTruthTable(self):
+        outputList = []
         output = ""
         for i in range (len(self.inputs)):
             output += "i" + str(i) + " "
         output += " | "
         for i in range (len(self.outputs)):
             output += "o" + str(i) + " "
-        output += "\n"  
-        output += '-'*(len(self.inputs)*3+len(self.outputs)*3+3) + "\n"
+        outputList.append(output) 
+        output = ""
+        output += '-'*(len(self.inputs)*3+len(self.outputs)*3+3)
+        outputList.append(output) 
+        output = ""
         for i in range (len(self.directions)):
             binaryVal = bin(i)[2:]
             binaryVal = [str(c) for c in binaryVal]
@@ -62,6 +66,10 @@ class Level:
                 binaryVal.insert(0, "0")  
             for j in binaryVal:             
                 output += j + "  "
-            output += " | " + str(self.directions[i]) + "\n"  
-        return output
+            output += " | "
+            for k in range(len(self.directions[i])):
+                output += str(self.directions[len(self.directions) - (i + 1)][k])
+            outputList.append(output) 
+            output = "" 
+        return outputList
      

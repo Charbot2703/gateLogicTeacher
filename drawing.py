@@ -10,6 +10,11 @@ from node import *
 WINDOW_WIDTH = 1600
 WINDOW_HEIGHT = 900
 
+
+def drawGrabbedNode(screen, grabbedNode):
+    color = pygame.Color("red" if grabbedNode.val else "black")
+    pygame.draw.line(screen, color, (grabbedNode.getX(), grabbedNode.getY()), (pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]), 10)
+
 def insideGate(gate, x, y):
     return ((x >= gate.getX() and x < (gate.getX() + gate.getWidth())) and 
             (y >= gate.getY() and y < (gate.getY() + gate.getHeight())))
@@ -50,8 +55,6 @@ def fix_output(l, padding):
 def compareAdderOutputs(outputsA, padding, input):
     iB = [int(k) for k in bin(input)[2:]]
     for i in range(len(outputsA)):
-        print(fix_output(iB, padding))
-        print(outputsA)
         if outputsA[i] != fix_output(iB, padding)[i]:
             return False
         return True
@@ -64,11 +67,11 @@ pause = True
 inGame = False
 running = True
 
-levels = [Level(2, 1, all_gates[3], "CREATE NAND", "PASS"),
-          Level(2, 1, all_gates[4], "CREATE OR", "PASS"),
-          Level(2, 1, all_gates[5], "CREATE EXOR", "PASS"),
-          Level(3, 2, all_gates[6], "CREATE HALF ADDER", "PASS"),
-          Level(9, 5, all_gates[7], "CREATE FULL ADDER", "PASS")]
+levels = [Level(2, 1, all_gates[3], "CREATE  NAND", "PASS"),
+          Level(2, 1, all_gates[4], "CREATE  OR", "PASS"),
+          Level(2, 1, all_gates[5], "CREATE  EXOR", "PASS"),
+          Level(3, 2, all_gates[6], "CREATE  HALF ADDER", "PASS"),
+          Level(9, 5, all_gates[7], "CREATE  FULL ADDER", "PASS")]
 mainMenuNode = Node(50, 450, 30)
 mainNodes = [mainMenuNode]
 startGameNode = InputNode(200, 350, 15)
@@ -107,13 +110,15 @@ toolbox = ToolBox(100)
 
 game = MenuManager()
 
-levelNum = 3
+levelNum = 0
+
 testInput = 0
 testOutputs = []
 haveGate = False
 haveNode = False
 levelNode = False
 draw_toolbox = False
+drawTruthTable = False
 while game.getMenuVars().getRunning():
     #================================================ Main Menu Loop
     while game.getMenuVars().getMain():
@@ -140,10 +145,18 @@ while game.getMenuVars().getRunning():
                 destNode = getGrabbedNode(menuNodes, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                 if destNode != None:
                     destNode.setPrevNode(grabbedNode)
+                    grabbedNode = None
         startGameNode.setValue(startGameNode.getPrevNodeValue())
         if startGameNode.getValue():
             game.startGame()
+            startGameNode.setValue(0)
+            mainMenuNode.setValue(0)
         screen.fill(pygame.Color("#43455C"))
+        try:
+            if grabbedNode != None:
+                drawGrabbedNode(screen, grabbedNode)
+        except:
+            pass
         mainMenuNode.draw(screen)
         for button in game.getMainMenuButtons():
             button.draw(screen)
@@ -166,7 +179,7 @@ while game.getMenuVars().getRunning():
                 for button in game.getPauseButtons():
                     if button.isMouseInside():
                         button.getFunction()()
-        screen.fill("#43455C")
+        screen.fill((pygame.Color("#43455C")))
         for button in game.getPauseButtons():
             button.draw(screen)
         clock.tick(144)
@@ -182,6 +195,8 @@ while game.getMenuVars().getRunning():
                 game.pauseGame()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_t:
                 draw_toolbox = not draw_toolbox
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_h:
+                drawTruthTable = not drawTruthTable
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if draw_toolbox:
                     grabbedGate = getGrabbedGate(toolbox.getTools(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
@@ -236,12 +251,17 @@ while game.getMenuVars().getRunning():
                 grabbedGate = None
                 haveGate = False
                 haveNode = False
-        
+                
         if haveGate:
             grabbedGate.setX(pygame.mouse.get_pos()[0] - (grabbedGate.getWidth()/2))
             grabbedGate.setY(pygame.mouse.get_pos()[1] - (grabbedGate.getHeight()/2))
 
-        screen.fill("#463F3A")
+        screen.fill((pygame.Color("#43455C")))
+        try:
+            if grabbedNode != None:
+                drawGrabbedNode(screen, grabbedNode)
+        except:
+            pass
         for button in game.getGameButtons():
             button.draw(screen)
         for i in range(len(levels[levelNum].getInputs())):
@@ -251,9 +271,18 @@ while game.getMenuVars().getRunning():
             levels[levelNum].getOutputs()[i].draw(screen)
         for i in range(len(levels[levelNum].getGates()) - 1, -1, -1):
             levels[levelNum].getGates()[i].evaluate()
-            levels[levelNum].getGates()[i].draw(screen)
+            levels[levelNum].getGates()[i].draw(screen)  
+        text = pygame.font.SysFont("adobegothicstdkalin", 100).render(levels[levelNum].getTitle(), False, pygame.Color("#3BBA9C"))
+        text2 = pygame.font.SysFont("adobegothicstdkalin", 100).render(levels[levelNum].getTitle(), False, "black")
+        screen.blit(text2, (((1600-text.get_size()[0])//2)+7,50+7))
+        screen.blit(text, ((1600-text.get_size()[0])//2,50))      
+        # if drawTruthTable:
+        #     screen.fill((pygame.Color("#43455C")))
+        #     for i in range(len(levels[levelNum].makeTruthTable())):
+        #         text = pygame.font.SysFont("adobegothicstdkalin", 70).render(levels[levelNum].makeTruthTable()[i], False, pygame.Color("#3BBA9C"))
+        #         screen.blit(text, ((1600-text.get_size()[0])//2,(450 + (50 * (i - len(levels[levelNum].makeTruthTable())//2)))))
         if draw_toolbox:
-            toolbox.draw(screen, 8)
+            toolbox.draw(screen, (levelNum + 2))
 
         clock.tick(144)
         pygame.display.flip()
@@ -272,8 +301,6 @@ while game.getMenuVars().getRunning():
             game.getMenuVars().setGame(True)
             testInput = 0
             levels[levelNum].setInputs(0)
-            print(testOutputs)
-            print(all_gates[levelNum + 2])
             if levelNum < 3:
                 passLevel = compareOutputs(testOutputs, all_gates[levelNum + 2])
             if passLevel :

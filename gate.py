@@ -5,7 +5,7 @@ class Gate():
     def __init__(self, pos, color, text, num_of_inputs, num_of_outputs, logic):
         self.pos = pos
         self.size = (200 + (len(text) - 4) * 25, 50 + 30*max(num_of_inputs, num_of_outputs))
-        self.color = "#AFCBFF"
+        self.color = color
         self.text = text
         self.textobject = pygame.font.SysFont("adobegothicstdkalin", 70).render(self.text, False, (0, 0, 0))
         self.inputs = [InputNode(0, 0, 15) for i in range(num_of_inputs)]

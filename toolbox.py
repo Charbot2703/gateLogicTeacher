@@ -22,8 +22,7 @@ class ToolBox():
                           self.or_gate,
                           self.exor_gate,
                           self.adder_gate,
-                          self.four_gate,
-                          self.eight_gate]
+                          self.four_gate]
         self.height = 900 - height
         self.define_something()
 
@@ -42,6 +41,8 @@ class ToolBox():
     def draw(self, screen, gates):
         screen.fill((pygame.Color("#43455C")))
         text = pygame.font.SysFont("adobegothicstdkalin", 100).render("TOOLBOX", False, pygame.Color("#3BBA9C"))
+        text2 = pygame.font.SysFont("adobegothicstdkalin", 100).render("TOOLBOX", False, "black")
+        screen.blit(text2, (((1600-text.get_size()[0])//2)+7,100+7))
         screen.blit(text, ((1600-text.get_size()[0])//2,100))
         for i in range(gates):
             if i < 4:
