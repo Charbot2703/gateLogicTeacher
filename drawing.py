@@ -11,6 +11,10 @@ WINDOW_WIDTH = 1600
 WINDOW_HEIGHT = 900
 
 
+def drawGrabbedNode(screen, grabbedNode):
+    color = pygame.Color("red" if grabbedNode.val else "black")
+    pygame.draw.line(screen, color, (grabbedNode.getX(), grabbedNode.getY()), (pygame.mouse.get_pos()[0],pygame.mouse.get_pos()[1]), 10)
+
 def insideGate(gate, x, y):
     return ((x >= gate.getX() and x < (gate.getX() + gate.getWidth())) and 
             (y >= gate.getY() and y < (gate.getY() + gate.getHeight())))
@@ -38,7 +42,8 @@ pause = True
 inGame = False
 running = True
 
-l = Level(2, 1, [0, 1, 1, 0], "PASS")
+l = Level(2, 1, [1, 1, 1, 0], "PASS")
+
 mainMenuNode = Node(50, 450, 30)
 mainNodes = [mainMenuNode]
 startGameNode = InputNode(200, 350, 15)
@@ -105,10 +110,16 @@ while game.getMenuVars().getRunning():
                 destNode = getGrabbedNode(menuNodes, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                 if destNode != None:
                     destNode.setPrevNode(grabbedNode)
+                    grabbedNode = None
         startGameNode.setValue(startGameNode.getPrevNodeValue())
         if startGameNode.getValue():
             game.startGame()
         screen.fill(pygame.Color("#43455C"))
+        try:
+            if grabbedNode != None:
+                drawGrabbedNode(screen, grabbedNode)
+        except:
+            pass
         mainMenuNode.draw(screen)
         for button in game.getMainMenuButtons():
             button.draw(screen)
@@ -131,11 +142,10 @@ while game.getMenuVars().getRunning():
                 for button in game.getPauseButtons():
                     if button.isMouseInside():
                         button.getFunction()()
-        screen.fill("white")
+        screen.fill((pygame.Color("#43455C")))
         for button in game.getPauseButtons():
             button.draw(screen)
         clock.tick(144)
-        pygame.display.flip()
         #============================================ End Pause
 
     #================================================ Game loop
@@ -195,12 +205,15 @@ while game.getMenuVars().getRunning():
                 grabbedGate = None
                 haveGate = False
                 haveNode = False
-        
+                
         if haveGate:
             grabbedGate.setX(pygame.mouse.get_pos()[0] - (grabbedGate.getWidth()/2))
             grabbedGate.setY(pygame.mouse.get_pos()[1] - (grabbedGate.getHeight()/2))
 
-        screen.fill("white")
+        
+        screen.fill((pygame.Color("#43455C")))
+        if grabbedNode != None:
+            drawGrabbedNode(screen, grabbedNode)
         for i in range(len(l.getInputs())):
             l.getInputs()[i].draw(screen)
         for i in range(len(l.getOutputs())):
