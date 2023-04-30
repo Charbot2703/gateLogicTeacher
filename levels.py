@@ -1,13 +1,27 @@
+from node import *
+ 
+WINDOW_WIDTH = 1600
+WINDOW_HEIGHT = 900
+
 class Level:
     def __init__(self, numInputs, numOutputs, directions, pastLevel):
-        self.node_list = []
+        self.gates = []
         self.directions = directions
         self.pastLevel = pastLevel 
-        self.inputs = [0]*numInputs
-        self.outputs = [0]*numOutputs
+        self.inputs = [Node(50, (WINDOW_HEIGHT/(numInputs+1)*(i+1)), 30) for i in range(numInputs)]
+        self.outputs = [InputNode(WINDOW_WIDTH - 50, (WINDOW_HEIGHT/(numOutputs+1)*(i+1)), 30) for i in range(numOutputs)]
 
-    def addNode(self, node):
-        self.node_list.append(node)
+    def addGate(self, gate):
+        self.gates.append(gate)
+
+    def getGates(self):
+        return self.gates
+    
+    def getInputs(self):
+        return self.inputs
+    
+    def getOutputs(self):
+        return self.outputs
 
     def makeTruthTable(self):
         output = ""
