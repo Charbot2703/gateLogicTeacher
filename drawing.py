@@ -118,6 +118,7 @@ haveGate = False
 haveNode = False
 levelNode = False
 draw_toolbox = False
+clearedNode = False
 drawTruthTable = False
 while game.getMenuVars().getRunning():
     #================================================ Main Menu Loop
@@ -217,12 +218,20 @@ while game.getMenuVars().getRunning():
                     levelNode = True
                 if not levelNode:
                     for gate in levels[levelNum].getGates():
-                        grabbedNode = getGrabbedNode(gate.getOutputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
-                        if grabbedNode != None:
-                            haveNode = True
-                            break
-                if (not haveNode) and (not levelNode):
+                        if event.button == 3:
+                            grabbedNode = getGrabbedNode(gate.getInputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                            if(type(grabbedNode) == InputNode):
+                                clearedNode = True
+                                grabbedNode.setPrevNode(None)
+                        else:
+                            grabbedNode = getGrabbedNode(gate.getOutputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                            if grabbedNode != None:
+                                haveNode = True
+                                break
+                if (not haveNode) and (not levelNode) and (not clearedNode):
                     grabbedGate = getGrabbedGate(levels[levelNum].getGates(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                    if event.button == 3:
+                        levels[levelNum].removeGate(grabbedGate)
                     if grabbedGate != None:
                         haveGate = True
             if event.type == pygame.MOUSEBUTTONUP:
@@ -251,6 +260,7 @@ while game.getMenuVars().getRunning():
                 grabbedGate = None
                 haveGate = False
                 haveNode = False
+                clearedNode = False
                 
         if haveGate:
             grabbedGate.setX(pygame.mouse.get_pos()[0] - (grabbedGate.getWidth()/2))
