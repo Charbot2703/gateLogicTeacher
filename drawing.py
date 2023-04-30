@@ -5,6 +5,7 @@ from gate_info import *
 from toolbox import ToolBox
 from button import Button
 from menu import MenuManager
+from node import *
 
 WINDOW_WIDTH = 1600
 WINDOW_HEIGHT = 900
@@ -38,6 +39,37 @@ inGame = False
 running = True
 
 l = Level(2, 1, [0, 1, 1, 0], "PASS")
+mainMenuNode = Node(50, 450, 30)
+mainNodes = [mainMenuNode]
+startGameNode = InputNode(200, 350, 15)
+quitGameNode = InputNode(200, 600, 15)
+startGameFake = Node(550, 350, 15)
+quitGameFake = Node(400, 600, 15)
+startGameFake.setValue(1)
+quitGameFake.setValue(1)
+menuNodes = [startGameNode, quitGameNode, startGameFake, quitGameFake]
+eduGame = Gate((900, 450-50), pygame.Color("#16A085"), "EduGate", 3, 2, lambda x: [1, 0])
+fake_and = Gate((650, 200), pygame.Color("#2980B9"), "AND", 2, 1, all_gates[1])
+fake_or = Gate((1350, 550), pygame.Color("#2C3E50"), "OR", 2, 1, all_gates[3])
+fake_exor = Gate((600, 600), pygame.Color("#F1C40F"), "EXOR", 2, 1, all_gates[4])
+fake_adder = Gate((1300, 150), pygame.Color("#E67E22"), "ADDER", 3, 2, all_gates[5])
+fake_gates = [eduGame, fake_adder, fake_and, fake_exor, fake_or]
+eduGame.getInputs()[1].setPrevNode(quitGameFake)
+fake_exor.getInputs()[1].setPrevNode(quitGameFake)
+fake_and.getInputs()[0].setPrevNode(startGameFake)
+fake_and.getInputs()[1].setPrevNode(startGameFake)
+fake_adder.getInputs()[2].setPrevNode(eduGame.getOutputs()[0])
+fake_adder.getInputs()[0].setPrevNode(fake_and.getOutputs()[0])
+fake_or.getInputs()[0].setPrevNode(eduGame.getOutputs()[1])
+fake_or.getInputs()[1].setPrevNode(fake_exor.getOutputs()[0])
+eduGame.getInputs()[0].setPrevNode(fake_and.getOutputs()[0])
+eduGame.getInputs()[2].setPrevNode(fake_exor.getOutputs()[0])
+for i in range(2):
+    for gates in fake_gates:
+        gates.setX(gates.getX())
+        gates.evaluate()
+
+
 
 toolbox = ToolBox(100)
 
@@ -56,12 +88,34 @@ while game.getMenuVars().getRunning():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 game.resumeGame()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                for button in game.getMainMenuButtons():
-                    if button.isMouseInside():
-                        button.getFunction()()
-        screen.fill("white")
+                # for button in game.getMainMenuButtons():
+                #     if button.isMouseInside():
+                #         button.getFunction()()
+                grabbedNode = getGrabbedNode(mainNodes, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                if grabbedNode != None:
+                    levelNode = True
+            if event.type == pygame.MOUSEBUTTONUP:
+                if levelNode:
+                    if getGrabbedNode(mainNodes, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]) == grabbedNode:
+                        grabbedNode.setValue(1 - grabbedNode.getValue())
+                        grabbedNode = None
+                        levelNode = False
+                    else:
+                        levelNode = False
+                destNode = getGrabbedNode(menuNodes, pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                if destNode != None:
+                    destNode.setPrevNode(grabbedNode)
+        startGameNode.setValue(startGameNode.getPrevNodeValue())
+        if startGameNode.getValue():
+            game.startGame()
+        screen.fill(pygame.Color("#43455C"))
+        mainMenuNode.draw(screen)
         for button in game.getMainMenuButtons():
             button.draw(screen)
+        for nodes in menuNodes:
+            nodes.draw(screen)
+        for gates in fake_gates:
+            gates.draw(screen)
         clock.tick(144)
         pygame.display.flip()
         #============================================ End Main Menu

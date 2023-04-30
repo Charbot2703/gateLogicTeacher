@@ -1,4 +1,5 @@
 from button import Button
+import pygame
 
 class MenuVars:
     def __init__(self):
@@ -39,8 +40,11 @@ class MenuManager:
                             Button(100, 250, "Return to Main Menu", "orange", self.exitToMenu),
                             Button(100, 400, "Quit", "red", self.quitGame)]
 
-        self.mainMenuButtons = [Button(100, 100, "Start Game", "lime", self.startGame),
-                            Button(100, 250, "Quit", "red", self.quitGame)]
+        self.mainMenuButtons = [Button(200, 450 - 100 - 50, "Start Game", pygame.Color("#2ECC71"), self.do_nothing),
+                            Button(200, 450 + 100, "Quit", pygame.Color("#C0392B"), self.quitGame)]
+        
+    def do_nothing(self):
+        pass
 
     def getMenuVars(self):
         return self.menuVars

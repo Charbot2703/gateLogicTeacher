@@ -8,14 +8,14 @@ class ToolBox():
 
     def __init__(self, height):
         self.all_gate_logic = all_gates
-        self.not_gate = Gate((800, 450), "orange", "NOT", 1, 1, all_gates[0])
-        self.and_gate = Gate((800, 450), "blue", "AND", 2, 1, all_gates[1])
-        self.nand_gate = Gate((800, 450), "green", "NAND", 2, 1, all_gates[2])
-        self.or_gate = Gate((800, 450), "red", "OR", 2, 1, all_gates[3])
-        self.exor_gate = Gate((800, 450), "pink", "EXOR", 2, 1, all_gates[4])
-        self.adder_gate = Gate((800, 450), "lime", "ADDER", 3, 2, all_gates[5])
-        self.four_gate = Gate((800, 450), "purple", "4-BIT ADDER", 9, 5, all_gates[6])
-        self.eight_gate = Gate((800, 450), "aqua", "8-BIT ADDER", 9, 7, all_gates[7])
+        self.not_gate = Gate((800, 450), pygame.Color("#27AE60"), "NOT", 1, 1, all_gates[0])
+        self.and_gate = Gate((800, 450), pygame.Color("#2980B9"), "AND", 2, 1, all_gates[1])
+        self.nand_gate = Gate((800, 450), pygame.Color("#8E44AD"), "NAND", 2, 1, all_gates[2])
+        self.or_gate = Gate((800, 450), pygame.Color("#2C3E50"), "OR", 2, 1, all_gates[3])
+        self.exor_gate = Gate((800, 450), pygame.Color("#F1C40F"), "EXOR", 2, 1, all_gates[4])
+        self.adder_gate = Gate((800, 450), pygame.Color("#E67E22"), "ADDER", 3, 2, all_gates[5])
+        self.four_gate = Gate((800, 450), pygame.Color("#E74C3C"), "4-BIT ADDER", 9, 5, all_gates[6])
+        self.eight_gate = Gate((800, 450), pygame.Color("#ECF0F1"), "8-BIT ADDER", 9, 7, all_gates[7])
         self.tool_list = [self.not_gate,
                           self.and_gate,
                           self.nand_gate,
