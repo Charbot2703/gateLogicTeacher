@@ -33,8 +33,8 @@ running = True
 l = Level(2, 1, [0, 1, 1, 0], "PASS")
 
 #Gate((x, y), color, text, in, out, dirs)
-testGate = Gate((100, 100), "orange", "TESTGATE", 2, 1, [0, 1, 1, 0])
-testGate2 = Gate((300, 100), "blue", "ANOTHERGATE", 4, 3, [0, 1, 1, 0])
+testGate = Gate((100, 100), "orange", "AND", 2, 1, [[0], [0], [0], [1]])
+testGate2 = Gate((300, 100), "blue", "OR", 2, 1, [[0], [1], [1], [1]])
 
 l.addGate(testGate)
 l.addGate(testGate2)
@@ -59,7 +59,7 @@ while running:
                 levelNode = True
             if not levelNode:
                 for gate in l.getGates():
-                    grabbedNode = getGrabbedNode(gate.getInputs() + gate.getOutputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                    grabbedNode = getGrabbedNode(gate.getOutputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                     if grabbedNode != None:
                         haveNode = True
                         break
@@ -69,9 +69,13 @@ while running:
                     haveGate = True
         if event.type == pygame.MOUSEBUTTONUP:
             if levelNode:
-                grabbedNode.setValue(1 - grabbedNode.getValue())
-                grabbedNode = None
-                levelNode = False
+                if getGrabbedNode(l.getInputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]) == grabbedNode:
+                    grabbedNode.setValue(1 - grabbedNode.getValue())
+                    grabbedNode = None
+                    levelNode = False
+                else:
+                    haveNode = True
+                    levelNode = False
             if haveNode:
                 destNode = getGrabbedNode(l.getOutputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                 if destNode != None:
@@ -96,14 +100,16 @@ while running:
         grabbedGate.setY(pygame.mouse.get_pos()[1] - (grabbedGate.getHeight()/2))
         change = True
 
-    if change:
-        screen.fill("white")
-        for i in range(len(l.getInputs())):
-            l.getInputs()[i].draw(screen)
-        for i in range(len(l.getOutputs())):
-            l.getOutputs()[i].draw(screen)
-        for i in range(len(l.getGates()) - 1, -1, -1):
-            l.getGates()[i].draw(screen)
+    #if change:
+    screen.fill("white")
+    for i in range(len(l.getInputs())):
+        l.getInputs()[i].draw(screen)
+    for i in range(len(l.getOutputs())):
+        l.getOutputs()[i].setValue(l.getOutputs()[i].getPrevNodeValue())
+        l.getOutputs()[i].draw(screen)
+    for i in range(len(l.getGates()) - 1, -1, -1):
+        l.getGates()[i].evaluate()
+        l.getGates()[i].draw(screen)
 
     clock.tick(144)
     pygame.display.flip()
