@@ -35,7 +35,14 @@ class InputNode(Node):
         self.prevNode = None
 
     def getPrevNodeValue(self):
-        return self.prevNode.getValue()
+        if self.prevNode:
+            return self.prevNode.getValue()
+        return 0
     
     def setPrevNode(self, node):
         self.prevNode = node
+
+    def draw(self, screen):
+        super().draw(screen)
+        if self.prevNode:
+            pygame.draw.line(screen,  "red" if self.prevNode.getValue() else "black", (self.x, self.y), (self.prevNode.getX(), self.prevNode.getY()), 10)

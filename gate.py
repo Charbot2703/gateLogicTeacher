@@ -48,8 +48,11 @@ class Gate():
         return self.outputs
 
     def evaluate(self):
-        output = self.logic[int("".join([str(i) for i in self.inputs]), 2)]
-        self.outputs = output
+        for node in self.inputs:
+            node.setValue(node.getPrevNodeValue())
+        output = self.logic[int("".join([str(i.getValue()) for i in self.inputs]), 2)]
+        for i in range(len(output)):
+            self.outputs[i].setValue(output[i])
 
     def draw(self, screen):
         text_size = self.textobject.get_size()
