@@ -22,14 +22,14 @@ exor_gate = [[0],
              [1],
              [0]]
 
-adder_gate = lambda args: [int(i) for i in bin(args[0] + args[1] + args[2])[2:]]
+adder_gate = lambda args: fix_output([int(i) for i in bin(args[0] + args[1] + args[2])[2:]], 2)
 
-def fix_output(l):
-    l = [0]*(5-len(l)) + l
+def fix_output(l, padding):
+    l = [0]*(padding-len(l)) + l
     l.append(l.pop(0))
     return l
 
-four_bit_adder = lambda args: fix_output([int(i) for i in bin(int("".join([str(i) for i in args[:4]]), 2) + int("".join([str(i) for i in args[4:8]]), 2) + args[8])[2:]])
+four_bit_adder = lambda args: fix_output([int(i) for i in bin(int("".join([str(i) for i in args[:4]]), 2) + int("".join([str(i) for i in args[4:8]]), 2) + args[8])[2:]], 5)
 
 
 eight_bit_adder=[[0, 0, 0, 0, 0, 0, 0, 0, 0],
