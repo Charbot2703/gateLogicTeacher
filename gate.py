@@ -66,9 +66,10 @@ class Gate():
         non_adders = ["AND", "NOT", "NAND", "OR", "EXOR"]
         if self.text in non_adders:
             output = self.logic[int("".join([str(i.getValue()) for i in self.inputs]), 2)]
-        # else:
-        #     list_nums = [i.getValue() for i in self.inputs]
-        #     output = self.logic()(list_nums)
+        else:
+            list_nums = [i.getValue() for i in self.inputs]
+            output = (self.getLogic())(list_nums)
+            print(output)
         for i in range(len(self.outputs)):
             self.outputs[i].setValue(output[i])
 
