@@ -27,7 +27,16 @@ class Node:
         return self.radius
 
     def draw(self, screen):
-        pygame.draw.circle(screen, "red" if self.val else "black", (self.x, self.y), self.radius)
+        color = pygame.Color("red" if self.val else "black")
+        pygame.draw.circle(screen, color, (self.x, self.y), self.radius)
+        if self.isMouseInside():
+            bright = lambda c: min(255, c+50)
+            pygame.draw.circle(screen, (bright(color.r), bright(color.g+50), bright(color.b+50)), (self.x, self.y), self.radius)
+
+    def isMouseInside(self):
+        return ((pygame.mouse.get_pos()[0] >= self.x - self.radius and pygame.mouse.get_pos()[0] <= self.x + self.radius) and
+                (pygame.mouse.get_pos()[1] >= self.y - self.radius and pygame.mouse.get_pos()[1] <= self.y + self.radius))
+
 
 class InputNode(Node):
     def __init__(self, x, y, radius):
