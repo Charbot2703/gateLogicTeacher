@@ -1,3 +1,4 @@
+
 import pygame
 from gate import Gate
 from gate_info import *
@@ -7,7 +8,7 @@ class ToolBox():
 
     def __init__(self, height):
         self.all_gate_logic = all_gates
-        self.not_gate = Gate((800, 450), pygame.Color("#32064A"), "NOT", 1, 1, all_gates[0])
+        self.not_gate = Gate((800, 450), "orange", "NOT", 1, 1, all_gates[0])
         self.and_gate = Gate((800, 450), "blue", "AND", 2, 1, all_gates[1])
         self.nand_gate = Gate((800, 450), "green", "NAND", 2, 1, all_gates[2])
         self.or_gate = Gate((800, 450), "red", "OR", 2, 1, all_gates[3])
@@ -39,6 +40,9 @@ class ToolBox():
         self.lowerY = self.upperY*2
 
     def draw(self, screen, gates):
+        screen.fill((pygame.Color("#43455C")))
+        text = pygame.font.SysFont("adobegothicstdkalin", 100).render("TOOLBOX", False, pygame.Color("#3BBA9C"))
+        screen.blit(text, ((1600-text.get_size()[0])//2,100))
         for i in range(gates):
             if i < 4:
                 self.tool_list[i].setPos((self.gapU*(i+1)+self.sumWidths(self.tool_list[:i])), self.upperY-self.tool_list[i].getHeight()//2)

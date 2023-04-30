@@ -156,7 +156,6 @@ while game.getMenuVars().getRunning():
             l.getGates()[i].evaluate()
             l.getGates()[i].draw(screen)
         if draw_toolbox:
-            screen.fill("white")
             toolbox.draw(screen, 8)
 
         clock.tick(144)

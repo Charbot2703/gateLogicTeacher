@@ -13,7 +13,7 @@ class Gate():
         self.logic = logic
 
     def getColor(self):
-        return self.color
+        return pygame.Color(self.color)
     
     def getText(self):
         return self.text
@@ -75,9 +75,16 @@ class Gate():
 
     def draw(self, screen):
         text_size = self.textobject.get_size()
+        if self.isMouseInside():
+            darken = lambda c: max(0, c-75)
+            pygame.draw.rect(screen, (darken(self.getColor().r), darken(self.getColor().g), darken(self.getColor().b)), ((self.pos[0]-5, self.pos[1]-5), (self.size[0]+10, self.size[1]+10)))
         pygame.draw.rect(screen, self.color, (self.pos, self.size))
         screen.blit(self.textobject, (self.pos[0] + (self.size[0] - text_size[0])//2, self.pos[1] + (self.size[1] - text_size[1])//2))
         for iNode in self.inputs:
             iNode.draw(screen)
         for oNode in self.outputs:
             oNode.draw(screen)
+
+    def isMouseInside(self):
+        return ((pygame.mouse.get_pos()[0] >= self.getX() and pygame.mouse.get_pos()[0] <= self.getX() + self.getWidth()) and
+                (pygame.mouse.get_pos()[1] >= self.getY() and pygame.mouse.get_pos()[1] <= self.getY() + self.getHeight()))
