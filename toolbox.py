@@ -7,7 +7,7 @@ class ToolBox():
 
     def __init__(self, height):
         self.all_gate_logic = all_gates
-        self.not_gate = Gate((800, 450), "orange", "NOT", 1, 1, all_gates[0])
+        self.not_gate = Gate((800, 450), pygame.Color("#32064A"), "NOT", 1, 1, all_gates[0])
         self.and_gate = Gate((800, 450), "blue", "AND", 2, 1, all_gates[1])
         self.nand_gate = Gate((800, 450), "green", "NAND", 2, 1, all_gates[2])
         self.or_gate = Gate((800, 450), "red", "OR", 2, 1, all_gates[3])
