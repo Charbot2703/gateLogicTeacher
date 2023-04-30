@@ -21,6 +21,9 @@ class Level:
     def getGates(self):
         return self.gates
     
+    def removeGate(self, gate):
+        self.gates.remove(gate)
+
     def setInputs(self, input):
         inputBinStr = bin(input)[2:]
         while len(inputBinStr) < len(self.inputs):
