@@ -1,5 +1,5 @@
 
-nor_gate = [[1],
+not_gate = [[1],
             [0]]
 
 and_gate = [[0],
@@ -22,11 +22,7 @@ exor_gate = [[0],
              [1],
              [0]]
 
-adder_gate = [[0,0],
-              [1,0],
-              [1,0],
-              [0,1],
-              [1,1]]
+adder_gate = lambda args: [i for i in bin(args[0] + args[1] + args[2])[2:]]
 
 four_bit_adder = [[0, 0, 0, 0, 0],
                   [0, 0, 0, 1, 0],
@@ -576,4 +572,4 @@ eight_bit_adder=[[0, 0, 0, 0, 0, 0, 0, 0, 0],
                  
                  ]
 
-print(len(eight_bit_adder))
+all_gates = [not_gate, and_gate, nand_gate, or_gate, exor_gate, adder_gate, four_bit_adder, eight_bit_adder]

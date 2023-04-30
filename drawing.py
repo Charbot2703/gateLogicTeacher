@@ -1,6 +1,8 @@
 import pygame
 from gate import Gate 
 from levels import Level
+from gate_info import *
+from toolbox import ToolBox
 
 WINDOW_WIDTH = 1600
 WINDOW_HEIGHT = 900
@@ -36,8 +38,10 @@ l = Level(2, 1, [0, 1, 1, 0], "PASS")
 testGate = Gate((100, 100), "orange", "AND", 2, 1, [[0], [0], [0], [1]])
 testGate2 = Gate((300, 100), "blue", "OR", 2, 1, [[0], [1], [1], [1]])
 
+
 l.addGate(testGate)
 l.addGate(testGate2)
+toolbox = ToolBox(100)
 
 
 for gate in l.getGates():
@@ -48,12 +52,23 @@ haveGate = False
 haveNode = False
 levelNode = False
 change = True
+draw_toolbox = False
 
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_q):
             running = False
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_t:
+            draw_toolbox = not draw_toolbox
         if event.type == pygame.MOUSEBUTTONDOWN:
+            if draw_toolbox:
+                grabbedGate = getGrabbedGate(toolbox.getTools(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                if grabbedGate != None:
+                    chosen_one = toolbox.createGate(grabbedGate)
+                    chosen_one.setPos(WINDOW_WIDTH//2-chosen_one.getWidth()//2, WINDOW_HEIGHT//2-chosen_one.getHeight()//2)
+                    l.addGate(chosen_one)
+                    draw_toolbox = False
+                    break
             grabbedNode = getGrabbedNode(l.getInputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
             if grabbedNode != None:
                 levelNode = True
@@ -100,7 +115,6 @@ while running:
         grabbedGate.setY(pygame.mouse.get_pos()[1] - (grabbedGate.getHeight()/2))
         change = True
 
-    #if change:
     screen.fill("white")
     for i in range(len(l.getInputs())):
         l.getInputs()[i].draw(screen)
@@ -110,6 +124,9 @@ while running:
     for i in range(len(l.getGates()) - 1, -1, -1):
         l.getGates()[i].evaluate()
         l.getGates()[i].draw(screen)
+    if draw_toolbox:
+        screen.fill("white")
+        toolbox.draw(screen, 8)
 
     clock.tick(144)
     pygame.display.flip()
