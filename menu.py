@@ -6,6 +6,7 @@ class MenuVars:
         self.main = True
         self.pause = False
         self.game = False
+        self.levelTest = False
         self.running = True
 
     def setMain(self, val):
@@ -26,6 +27,12 @@ class MenuVars:
     def getGame(self):
         return self.game
     
+    def setLevelTest(self, val):
+        self.levelTest = val
+
+    def getLevelTest(self):
+        return self.levelTest
+    
     def setRunning(self, val):
         self.running = val
 
@@ -43,6 +50,9 @@ class MenuManager:
         self.mainMenuButtons = [Button(200, 450 - 100 - 50, "Start Game", pygame.Color("#2ECC71"), self.do_nothing),
                             Button(200, 450 + 100, "Quit", pygame.Color("#C0392B"), self.quitGame)]
         
+        self.gameButtons = [Button(1300, 10, "Submit", "#3BBA9C", self.runLevelTest)]
+
+        
     def do_nothing(self):
         pass
 
@@ -54,6 +64,9 @@ class MenuManager:
     
     def getMainMenuButtons(self):
         return self.mainMenuButtons
+    
+    def getGameButtons(self):
+        return self.gameButtons
 
     def startGame(self):
         self.menuVars.setMain(False)
@@ -77,3 +90,7 @@ class MenuManager:
         self.menuVars.setGame(False)
         self.menuVars.setPause(False)
         self.menuVars.setRunning(False)
+
+    def runLevelTest(self):
+        self.menuVars.setGame(False)
+        self.menuVars.setLevelTest(True)

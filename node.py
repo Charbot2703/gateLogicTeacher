@@ -54,4 +54,4 @@ class InputNode(Node):
     def draw(self, screen):
         super().draw(screen)
         if self.prevNode:
-            pygame.draw.line(screen,  "red" if self.prevNode.getValue() else "black", (self.x, self.y), (self.prevNode.getX(), self.prevNode.getY()), 10)
+            pygame.draw.line(screen,  "#FF3C38" if self.prevNode.getValue() else "#370617", (self.x, self.y), (self.prevNode.getX(), self.prevNode.getY()), 10)

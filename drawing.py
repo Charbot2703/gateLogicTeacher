@@ -35,6 +35,31 @@ def getGrabbedGate(gates, mx, my):
             return gate
     return None
 
+def compareOutputs(outputsA, outputsB):
+    if len(outputsA) != len(outputsB):
+        return False
+    for i in range(len(outputsA)):
+        if len(outputsB[i]) > 1:
+            for j in range(len(outputsB)):
+                if outputsA[i][j] != outputsB[i][j]:
+                    return False
+        if outputsA[i][0] != outputsB[i][0]:
+            return False
+    return True
+
+def fix_output(l, padding):
+    l = [0]*(padding-len(l)) + l
+    l.append(l.pop(0))
+    return l
+
+def compareAdderOutputs(outputsA, padding, input):
+    iB = [int(k) for k in bin(input)[2:]]
+    for i in range(len(outputsA)):
+        if outputsA[i] != fix_output(iB, padding)[i]:
+            return False
+        return True
+
+
 pygame.init()
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 clock = pygame.time.Clock()
@@ -42,8 +67,11 @@ pause = True
 inGame = False
 running = True
 
-l = Level(2, 1, [1, 1, 1, 0], "PASS")
-
+levels = [Level(2, 1, all_gates[3], "CREATE  NAND", "PASS"),
+          Level(2, 1, all_gates[4], "CREATE  OR", "PASS"),
+          Level(2, 1, all_gates[5], "CREATE  EXOR", "PASS"),
+          Level(3, 2, all_gates[6], "CREATE  HALF ADDER", "PASS"),
+          Level(9, 5, all_gates[7], "CREATE  FULL ADDER", "PASS")]
 mainMenuNode = Node(50, 450, 30)
 mainNodes = [mainMenuNode]
 startGameNode = InputNode(200, 350, 15)
@@ -76,14 +104,21 @@ for i in range(2):
 
 
 
+n = Node(50, 450, 50)
+
 toolbox = ToolBox(100)
 
 game = MenuManager()
 
+levelNum = 0
+
+testInput = 0
+testOutputs = []
 haveGate = False
 haveNode = False
 levelNode = False
 draw_toolbox = False
+drawTruthTable = False
 while game.getMenuVars().getRunning():
     #================================================ Main Menu Loop
     while game.getMenuVars().getMain():
@@ -114,6 +149,8 @@ while game.getMenuVars().getRunning():
         startGameNode.setValue(startGameNode.getPrevNodeValue())
         if startGameNode.getValue():
             game.startGame()
+            startGameNode.setValue(0)
+            mainMenuNode.setValue(0)
         screen.fill(pygame.Color("#43455C"))
         try:
             if grabbedNode != None:
@@ -146,6 +183,7 @@ while game.getMenuVars().getRunning():
         for button in game.getPauseButtons():
             button.draw(screen)
         clock.tick(144)
+        pygame.display.flip()
         #============================================ End Pause
 
     #================================================ Game loop
@@ -157,31 +195,39 @@ while game.getMenuVars().getRunning():
                 game.pauseGame()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_t:
                 draw_toolbox = not draw_toolbox
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_h:
+                drawTruthTable = not drawTruthTable
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if draw_toolbox:
                     grabbedGate = getGrabbedGate(toolbox.getTools(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                     if grabbedGate != None:
                         chosen_one = toolbox.createGate(grabbedGate)
                         chosen_one.setPos(WINDOW_WIDTH//2-chosen_one.getWidth()//2, WINDOW_HEIGHT//2-chosen_one.getHeight()//2)
-                        l.addGate(chosen_one)
+                        levels[levelNum].addGate(chosen_one)
                         draw_toolbox = False
                         break
-                grabbedNode = getGrabbedNode(l.getInputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                for button in game.getGameButtons():
+                    if button.isMouseInside():
+                        testInput = 0
+                        testOutputs = []
+                        button.getFunction()()
+                        break
+                grabbedNode = getGrabbedNode(levels[levelNum].getInputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                 if grabbedNode != None:
                     levelNode = True
                 if not levelNode:
-                    for gate in l.getGates():
+                    for gate in levels[levelNum].getGates():
                         grabbedNode = getGrabbedNode(gate.getOutputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                         if grabbedNode != None:
                             haveNode = True
                             break
                 if (not haveNode) and (not levelNode):
-                    grabbedGate = getGrabbedGate(l.getGates(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                    grabbedGate = getGrabbedGate(levels[levelNum].getGates(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                     if grabbedGate != None:
                         haveGate = True
             if event.type == pygame.MOUSEBUTTONUP:
                 if levelNode:
-                    if getGrabbedNode(l.getInputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]) == grabbedNode:
+                    if getGrabbedNode(levels[levelNum].getInputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1]) == grabbedNode:
                         grabbedNode.setValue(1 - grabbedNode.getValue())
                         grabbedNode = None
                         levelNode = False
@@ -189,12 +235,12 @@ while game.getMenuVars().getRunning():
                         haveNode = True
                         levelNode = False
                 if haveNode:
-                    destNode = getGrabbedNode(l.getOutputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
+                    destNode = getGrabbedNode(levels[levelNum].getOutputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                     if destNode != None:
                         destNode.setPrevNode(grabbedNode)
                         haveNode = False
                     if haveNode:
-                        for gate in l.getGates():
+                        for gate in levels[levelNum].getGates():
                             destNode = getGrabbedNode(gate.getInputs(), pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1])
                             if destNode != None:
                                 destNode.setPrevNode(grabbedNode)
@@ -210,23 +256,83 @@ while game.getMenuVars().getRunning():
             grabbedGate.setX(pygame.mouse.get_pos()[0] - (grabbedGate.getWidth()/2))
             grabbedGate.setY(pygame.mouse.get_pos()[1] - (grabbedGate.getHeight()/2))
 
-        
         screen.fill((pygame.Color("#43455C")))
-        if grabbedNode != None:
-            drawGrabbedNode(screen, grabbedNode)
-        for i in range(len(l.getInputs())):
-            l.getInputs()[i].draw(screen)
-        for i in range(len(l.getOutputs())):
-            l.getOutputs()[i].setValue(l.getOutputs()[i].getPrevNodeValue())
-            l.getOutputs()[i].draw(screen)
-        for i in range(len(l.getGates()) - 1, -1, -1):
-            l.getGates()[i].evaluate()
-            l.getGates()[i].draw(screen)
+        try:
+            if grabbedNode != None:
+                drawGrabbedNode(screen, grabbedNode)
+        except:
+            pass
+        for button in game.getGameButtons():
+            button.draw(screen)
+        for i in range(len(levels[levelNum].getInputs())):
+            levels[levelNum].getInputs()[i].draw(screen)
+        for i in range(len(levels[levelNum].getOutputs())):
+            levels[levelNum].getOutputs()[i].setValue(levels[levelNum].getOutputs()[i].getPrevNodeValue())
+            levels[levelNum].getOutputs()[i].draw(screen)
+        for i in range(len(levels[levelNum].getGates()) - 1, -1, -1):
+            levels[levelNum].getGates()[i].evaluate()
+            levels[levelNum].getGates()[i].draw(screen)  
+        text = pygame.font.SysFont("adobegothicstdkalin", 100).render(levels[levelNum].getTitle(), False, pygame.Color("#3BBA9C"))
+        text2 = pygame.font.SysFont("adobegothicstdkalin", 100).render(levels[levelNum].getTitle(), False, "black")
+        screen.blit(text2, (((1600-text.get_size()[0])//2)+7,50+7))
+        screen.blit(text, ((1600-text.get_size()[0])//2,50))      
+        # if drawTruthTable:
+        #     screen.fill((pygame.Color("#43455C")))
+        #     for i in range(len(levels[levelNum].makeTruthTable())):
+        #         text = pygame.font.SysFont("adobegothicstdkalin", 70).render(levels[levelNum].makeTruthTable()[i], False, pygame.Color("#3BBA9C"))
+        #         screen.blit(text, ((1600-text.get_size()[0])//2,(450 + (50 * (i - len(levels[levelNum].makeTruthTable())//2)))))
         if draw_toolbox:
-            toolbox.draw(screen, 8)
+            toolbox.draw(screen, (levelNum + 2))
 
         clock.tick(144)
         pygame.display.flip()
         #========================================= End Game Loop
+
+    #============================================= Start Level Test
+    while game.getMenuVars().getLevelTest():
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game.quitGame()
+
+        screen.fill("tan")
+
+        if(testInput > 2**(len(levels[levelNum].getInputs())) - 1):
+            game.getMenuVars().setLevelTest(False)
+            game.getMenuVars().setGame(True)
+            testInput = 0
+            levels[levelNum].setInputs(0)
+            if levelNum < 3:
+                passLevel = compareOutputs(testOutputs, all_gates[levelNum + 2])
+            if passLevel :
+                levelNum += 1
+                testOutputs = []
+
+        levels[levelNum].setInputs(testInput)
+        testInput += 1
+
+        for i in range(len(levels[levelNum].getGates()) - 1, -1, -1):
+            levels[levelNum].getGates()[i].evaluate()
+            for j in range(len(levels[levelNum].getGates())):
+                levels[levelNum].getGates()[j].evaluate()
+            levels[levelNum].getGates()[i].draw(screen)
+        for i in range(len(levels[levelNum].getInputs())):
+            levels[levelNum].getInputs()[i].draw(screen)
+        for i in range(len(levels[levelNum].getOutputs())):
+            levels[levelNum].getOutputs()[i].setValue(levels[levelNum].getOutputs()[i].getPrevNodeValue())
+            levels[levelNum].getOutputs()[i].draw(screen)
+
+        testOutputs.append(levels[levelNum].getOutputValues())
+
+        if(levelNum >= 3):
+                passLevel = compareAdderOutputs(levels[levelNum].getOutputValues(),2, sum(levels[levelNum].getInputValues()))
+                if not passLevel:
+                    game.getMenuVars().setLevelTest(False)
+                    game.getMenuVars().setGame(True)
+                    testInput = 0
+
+
+        clock.tick(1)
+        pygame.display.flip()
+        
 
 pygame.quit()

@@ -2,6 +2,10 @@
 ![](https://i.ibb.co/RYG5cc9/Untitled.png)
 The challenge that our team decided to tackle was to create an interactive learning experience that can help teach engineers the importance of logic gates. Logic gates are the building block of all computers, and understanding how they work is essential to mastering engineering. With only the AND and NOT gates, it's possible to create any output you desire. In our project we guide the user, only starting with the AND and NOT gates to build up their toolbox of logic gates. Eventually creating computer adders.
 
+## Installation
+Run in bash <code>git clone https://github.com/Charbot2703/gateLogicTeacher.git</code>.
+Once cloned run the drawing.py file and enjoy!!
+
 ## Inspiration
 Our team really cares for the education of computer science. And we thought that this would be a cool interactive way to teach users how to use logic gates and show the capabilities of building up little by little.
 

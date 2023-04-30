@@ -22,8 +22,7 @@ class ToolBox():
                           self.or_gate,
                           self.exor_gate,
                           self.adder_gate,
-                          self.four_gate,
-                          self.eight_gate]
+                          self.four_gate]
         self.height = 900 - height
         self.define_something()
 
